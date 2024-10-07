@@ -27,7 +27,6 @@ def fetch_date(date):
 
 def fetch_month():
     dates = range(1,32)
-    fetch_date(30)
     results = map(fetch_date,dates)
     return [concert for concerts in results for concert in concerts]
 
