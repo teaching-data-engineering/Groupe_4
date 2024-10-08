@@ -19,5 +19,4 @@ def main(repertory):
 
 
 if '__main__' == __name__:
-    df = main('data')
-    print(df)
+    main()
