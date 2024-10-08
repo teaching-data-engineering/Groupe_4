@@ -19,5 +19,5 @@ def main(repertory):
 
 
 if '__main__' == __name__:
-    df = load_data_events('data')
-    print(df.shape())
+    df = main('data')
+    print(df)
