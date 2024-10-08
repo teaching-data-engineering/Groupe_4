@@ -4,6 +4,7 @@ import time
 import pickle
 import pandas as pd 
 
+
 def fetch_page(link):
     time.sleep(0.5)
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
