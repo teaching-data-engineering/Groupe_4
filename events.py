@@ -2,7 +2,6 @@ import requests
 import re
 import time
 import pickle
-import pandas as pd 
 
 def fetch_page(link):
     time.sleep(0.5)
@@ -35,13 +34,9 @@ def save(concerts):
     with open('concerts.pkl', 'wb') as f:
        pickle.dump(concerts, f)
 
-
-
-
 def main():
     concerts = fetch_month()
     save(concerts)
 
 if __name__=="__main__": 
     main()
-    
