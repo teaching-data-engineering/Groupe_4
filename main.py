@@ -14,7 +14,7 @@ def main():
     df = enrich.process_data(df,ask_gemini= False)
 
     # Exportations des données enrichies sur GoogleQuery
-    basing.func_basing(df)
+    basing.data_to_gbq(df)
 
 if __name__ == '__main__':
     main()
