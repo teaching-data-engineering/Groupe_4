@@ -4,7 +4,7 @@ import google.generativeai as genai
 from load_data import load_all_events
 
 # Configuration de l'API Gemini
-with open('api_key.txt', 'r') as file:
+with open('credentials/api_key.txt', 'r') as file:
     api_key = file.read().strip()
 
 os.environ["GEMINI_API_KEY"] = api_key
@@ -102,27 +102,26 @@ def process_data(df,ask_gemini = False):
     if ask_gemini:
         nationalities = get_nationality_artists(artists)
         capacities = get_category_venues(venues)
+
+        with open('metadata/artist_nationalities.json', 'w') as f:
+            json.dump(nationalities, f, indent=2)
+
+        with open('metadata/venue_capacities.json', 'w') as f:
+            json.dump(capacities, f, indent=2)
+
     else:
-        with open('artist_nationalities.json', 'r') as f:
+        with open('metadata/artist_nationalities.json', 'r') as f:
             nationalities = json.load(f)
-        with open('venue_capacities.json', 'r') as f:
+        with open('metadata/venue_capacities.json', 'r') as f:
             capacities = json.load(f)
-
-    with open('artist_nationalities.json', 'w') as f:
-        json.dump(nationalities, f, indent=2)
-
-    # Récupération des catégories des lieux d'events 
-    with open('venue_capacities.json', 'w') as f:
-        json.dump(capacities, f, indent=2)
 
     # Reconstruction des données
     df['nationality'] = df['artistName'].map(nationalities)
-    df['capacity'] = df['venueName'].map(capacities)
+    df['venueType'] = df['venueName'].map(capacities)
 
     # Binarisation de la nationalité
     df['international'] = df['nationality'].apply(lambda x: x != 'DE') 
 
-    df.to_csv('events_enriched.csv')
     return df 
 
 # Exemple d'utilisation
