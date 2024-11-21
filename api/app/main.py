@@ -71,3 +71,31 @@ async def get_events_by_day_of_week(page: int = 1, week: str = None):
     data = df_day_of_week.to_dict()
      
     return data
+
+@app.put("/events/update-artist")
+async def update_artist(artist_old: str, lieu: str, artist_new: str):
+    query = f"""update `dataset_groupe_4.enrich` 
+    set artistName = '{artist_new}'
+    where artistName = '{artist_old}' and venueName = '{lieu}'
+    """
+    
+    # Exécutez la requête
+    query_job = client.query(query)
+    query_job.result()
+    
+    return {"message": "Artist Name updated successfully"}
+
+@app.put("/events/update-venue")
+async def update_venue(venue_old: str, venue_new: str, artist: str):
+    query = f"""update `dataset_groupe_4.enrich` 
+    set venueName = '{venue_new}'
+    where venueName = '{venue_old}'and artistName = '{artist}'
+    """
+    
+    # Exécutez la requête
+    query_job = client.query(query)
+    query_job.result()
+    
+    return {"message": "Venue Name updated successfully"}
+    
+    
