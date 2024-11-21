@@ -49,6 +49,25 @@ async def get_events(page: int = 1):
     return display
 
 
-
+@app.get("/events/by-day-of-week")
+async def get_events_by_day_of_week(page: int = 1, week: str = None):
+    query = f"""select * 
+    from `dataset_groupe_4.enrich`
+    """
     
+    # Exécutez la requête
+    query_job = client.query(query)
     
+    # Récupérez les résultats
+    df = query_job.result().to_dataframe()
+    df['startsAt'] = pd.to_datetime(df['startsAt'])
+    df['day_of_week'] = df['startsAt'].dt.day_name()
+    df['week'] = df['startsAt'].dt.isocalendar().week
+    if week:
+        df = df.query(f"week == {week}")
+    df_day_of_week = df.groupby('day_of_week')["day_of_week"].count()
+    
+    # convert to dictionary
+    data = df_day_of_week.to_dict()
+     
+    return data
