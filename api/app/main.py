@@ -22,5 +22,33 @@ def display_data(data, end_point, page = 1):
     return {"data":data_display}, display
 
 
+from pydantic import BaseModel
+class Objet(BaseModel):
+    name: str
+    price: float
+    is_offer: Union[bool, None] = None
+
+
+@app.get("/events")
+async def get_events(page: int = 1):
+    query = f"""select * 
+    from `dataset_groupe_4.enrich`
+    """
+    
+    # Exécutez la requête
+    query_job = client.query(query)
+    
+    # Récupérez les résultats
+    results = query_job.result()
+    
+    # Récupérer les données en liste de dictionnaires
+    data = [dict(row) for row in results]
+    
+    display = display_data(data, "events", page)
+    
+    return display
+
+
+
     
     

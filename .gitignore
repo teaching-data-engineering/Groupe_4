@@ -2,3 +2,7 @@ events_old.py
 concerts.pkl
 api_key.txt
 data/
+__pycache__/
+credentials/
+api/app/__pycache__/
+enrechissement.py
