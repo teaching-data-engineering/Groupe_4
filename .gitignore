@@ -2,3 +2,5 @@ events_old.py
 concerts.pkl
 api_key.txt
 data/
+__pycache__/
+token_user.json
