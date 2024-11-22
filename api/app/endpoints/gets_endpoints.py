@@ -1,17 +1,15 @@
-
-# Import des modules nécessaires pour l'routerlication FastAPI et la gestion des données
+# Import des modules nécessaires pour l'application FastAPI et la gestion des données
 from typing import Optional
 from datetime import date
 from fastapi import APIRouter
-
 from fastapi import HTTPException
 from pagination import display_data
 from get_bq_data import get_bq_data  # Importation d'une fonction pour récupérer les données de BigQuery
-from difflib import SequenceMatcher  # Pour la recherche routerroximative de correspondance de noms
+from difflib import SequenceMatcher  # Pour la recherche approximative de correspondance de noms
 import pandas as pd
 from joblib import load  # Pour charger des modèles enregistrés (ex: Random Forest)
 
-# Initialisation de l'routerlication FastAPI
+# Initialisation de l'application FastAPI
 router = APIRouter()
 
 # Connexion à BigQuery
@@ -19,8 +17,6 @@ client = get_bq_data()
 
 # Spécification de la table dans BigQuery
 data = "`dataset_groupe_4.enrich`"
-
-
 
 # Route pour obtenir tout les événements 
 @router.get("/events")
@@ -57,11 +53,11 @@ def event_search(
 
     # Si un nom d'artiste est fourni, on ajoute une condition pour filtrer sur cet artiste (en ignorant les majuscules et les espaces)
     if artistName:
-        conditions.routerend(f'LOWER(REPLACE(artistName, " ", "")) = "{artistName.lower().replace(" ", "")}"')
+        conditions.append(f'LOWER(REPLACE(artistName, " ", "")) = "{artistName.lower().replace(" ", "")}"')
    
     # Si un nom de lieu est fourni, on ajoute une condition pour filtrer sur ce lieu
     if venueName:
-        conditions.routerend(f'LOWER(REPLACE(venueName, " ", "")) = "{venueName.lower().replace(" ", "")}"')
+        conditions.append(f'LOWER(REPLACE(venueName, " ", "")) = "{venueName.lower().replace(" ", "")}"')
     
     # Si des dates de début ou de fin sont spécifiées, on ajoute une condition de plage de dates
     if start_date or end_date:
@@ -69,7 +65,7 @@ def event_search(
             start_date = "2000-01-01"  # Date de début par défaut
         if not end_date:
             end_date = date.today().strftime("%Y-%m-%d")  # Date de fin par défaut (aujourd'hui)
-        conditions.routerend(f'startsAt BETWEEN "{start_date}T00:00:00" AND "{end_date}T23:59:59"')
+        conditions.append(f'startsAt BETWEEN "{start_date}T00:00:00" AND "{end_date}T23:59:59"')
 
     # Création de la clause WHERE en fonction des conditions
     where_clause = " AND ".join(conditions) if conditions else "1=1"  # Si aucune condition, on retourne tout
@@ -94,7 +90,7 @@ def event_artist(
     artistName: str,
     page: int = 1
 ):
-    # Fonction pour mesurer la similarité entre deux chaînes de caractères (pour les correspondances routerroximatives)
+    # Fonction pour mesurer la similarité entre deux chaînes de caractères (pour les correspondances approximatives)
     def similar(a, b):
         return SequenceMatcher(None, a, b).ratio()
 
@@ -168,7 +164,7 @@ def by_venue(page : int = 1):
         global_stats AS (
             SELECT
                 ROUND(AVG(eventCount),1) AS avgCount,
-                routerROX_QUANTILES(eventCount, 100)[OFFSET(50)] AS medianCount,
+                APPROX_QUANTILES(eventCount, 100)[OFFSET(50)] AS medianCount,
                 MIN(eventCount) AS minCount,
                 MAX(eventCount) AS maxCount,
                 SUM(eventCount) AS totalCount
@@ -217,9 +213,9 @@ def is_popular(
     # Liste des conditions pour la requête SQL
     conditions = []
     if artistName:
-        conditions.routerend(f'artistName = "{artistName}"')
+        conditions.append(f'artistName = "{artistName}"')
     if venueName:
-        conditions.routerend(f'venueName = "{venueName}"')
+        conditions.append(f'venueName = "{venueName}"')
 
     # Si aucun paramètre n'est fourni, on renvoie une erreur
     if not venueName and not artistName:
@@ -227,14 +223,14 @@ def is_popular(
     
     # Création de la clause WHERE en fonction des conditions
     where_clause = " AND ".join(conditions) if conditions else "1=1"
-    
+
     # Requête pour récupérer les événements associés à l'artiste ou au lieu spécifié
     query = f"""
         SELECT venueName, venueType, Weekend, duration, international, artistName
         FROM {data}
         WHERE {where_clause}
     """
-
+    
     query_job = client.query(query)
     result_data = [dict(row) for row in query_job.result()]  # Résultats des événements
 
@@ -258,30 +254,59 @@ def is_popular(
 
     return {"events": events_with_predictions}
 
-
-
 @router.get("/events/popular_event_these_days")
 async def popular_event_these_days(
-    startdate : str ,
-    endate : Optional[str] = None,
-    page : int = 1):
-
+    startdate: str,
+    endate: Optional[str] = None,
+    page: int = 1
+):
+    data = "`dataset_groupe_4.enrich`"
     if endate is None:
         endate = date.today().strftime("%Y-%m-%d")
 
-    # Requête SQL pour obtenir les événements populaires entre deux dates
+    # Requête SQL pour obtenir les événements entre deux dates
     query = f"""
-        SELECT * 
+        SELECT venueName, venueType, Weekend, duration, international, artistName, startsAt
         FROM {data}
         WHERE startsAt BETWEEN '{startdate}T00:00:00' AND '{endate}T23:59:59'
-        AND rsvpCountInt > 100
     """
+    
     # Exécution de la requête SQL
     query_job = client.query(query)
-    result_data = [dict(row) for row in query_job.result()]  # Résultats des événements populaires
-    display = display_data(result_data, "events/popular_event_these_days", page)
+    result_data = [dict(row) for row in query_job.result()]  # Résultats des événements
 
-    return display  # Retour des résultats au format JSON
+    # Chargement du modèle et des encodeurs pour la prédiction
+    model = load("model/random_forest_popularity_model.pkl")
+    venueName_encoder = load("model/venueName_encoder.pkl")
+
+    
+    venueType_encoder = load("model/venueType_encoder.pkl")
+
+    # Conversion des résultats en DataFrame
+    df = pd.DataFrame(result_data)
+    df = df.dropna(subset=["venueType"])
+
+    # Transformation des colonnes avant la prédiction
+    df["Original_venueName"] = df["venueName"].copy()
+    df["venueName"] = venueName_encoder.transform(df["venueName"])
+    df["venueType"] = venueType_encoder.transform(df["venueType"])
+
+    # Prédiction de la popularité des événements
+    df["predicted_popularity"] = model.predict(
+        df.drop(columns=["Original_venueName", "artistName", "startsAt"])
+    )
+
+    # Filtrer les événements populaires
+    popular_events = df[df["predicted_popularity"] == "Populaire"]
+
+    # Retourner les résultats avec les prédictions sous forme de liste de dictionnaires
+    events_with_predictions = popular_events[
+        ["Original_venueName", "artistName", "predicted_popularity", "startsAt"]
+    ].to_dict(orient="records")
+
+    display = display_data(events_with_predictions, "events/popular_event_these_days", page)
+    return display
+
 
 if __name__ == "__main__":
     pass
