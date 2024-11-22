@@ -2,7 +2,7 @@ import requests
 import json
 
 # URL de l'API
-url = "http://127.0.0.1:8000/items/"
+url = "http://127.0.0.1:8000/events?page=1"
 
 # Charger le token depuis le fichier JSON
 with open('token_user.json') as f:

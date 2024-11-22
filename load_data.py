@@ -2,13 +2,12 @@ import os
 import pandas as pd
 import pickle
 from functools import reduce
-from basing import data_to_gbq
 
 def load_data_events(pkl_file): 
     with open(pkl_file, 'rb') as f:
         concerts = pickle.load(f)
     df = pd.DataFrame(concerts)
-    #df = df.loc[:, ~df.apply(lambda col: col.astype(str).str.startswith('https://')).any()]
+    df = df.loc[:, ~df.apply(lambda col: col.astype(str).str.startswith('https://')).any()]
     return df
 
 
@@ -21,7 +20,6 @@ def load_all_events():
 
 if '__main__' == __name__:
    df = load_all_events()
-   data_to_gbq(df) 
-   #df.to_csv('events.csv')
-   #df.head()
-
+   df.to_csv('events.csv')
+   print(df.head())
+   print(df.columns)

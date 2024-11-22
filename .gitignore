@@ -1,6 +1,8 @@
-events_old.py
-concerts.pkl
-api_key.txt
+credentials/
+credentials/*
+*/__pycache__
+pyproject.toml
+poetry.lock
 data/
-__pycache__/
+__pycache__/ 
 token_user.json
