@@ -8,3 +8,5 @@ __pycache__/
 credentials/
 api/app/__pycache__/
 enrechissement.py
+api_key.txt
+model_backup.py
