@@ -21,4 +21,5 @@ def load_all_events():
 if '__main__' == __name__:
    df = load_all_events()
    df.to_csv('events.csv')
-   df.head()
+   print(df.head())
+   print(df.columns)

@@ -1,4 +1,7 @@
 credentials/
 credentials/*
-
+*/__pycache__
+pyproject.toml
+poetry.lock
 data/
+__pycache__/ 

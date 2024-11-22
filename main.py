@@ -11,10 +11,11 @@ def main():
     df = load_data.load_all_events()
 
     # Enrichissement des données
-    df = enrich.process_data(df,ask_gemini= False)
+    df = enrich.process_data(df,ask_gemini= True)
 
+    
     # Exportations des données enrichies sur GoogleQuery
-    basing.data_to_gbq(df)
+   #basing.data_to_gbq(df,replace=True)
 
 if __name__ == '__main__':
     main()
