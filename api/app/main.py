@@ -5,6 +5,7 @@ from typing import Union
 from fastapi import FastAPI
 import get_bq_data 
 import pandas as pd
+from fastapi.responses import HTMLResponse
 import datetime
 
 app = FastAPI()
@@ -27,6 +28,53 @@ class Objet(BaseModel):
     name: str
     price: float
     is_offer: Union[bool, None] = None
+
+# endpoin root
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    # HTML stylé pour la page d'accueil
+    message = """
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bienvenue sur notre API</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 2em;
+                background-color: #f4f4f9;
+                color: #333;
+            }
+            h1 {
+                color: #4CAF50;
+            }
+            a {
+                color: #4CAF50;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .container {
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Bienvenue sur notre API</h1>
+        <p>Ci-dessous vous trouverez les fonctionnalités disponibles :</p>
+        <div class="container">
+            <p><a href="/docs" target="_blank">📄 Documentation de l'API</a></p>
+            <p><a href="/events" target="_blank">📅 Liste des événements</a></p>
+            <p><a href="/events/by-day-of-week" target="_blank">📊 Événements par jour de la semaine</a></p>
+        </div>
+    </body>
+    </html>
+    """
+    return message
 
 
 @app.get("/events")

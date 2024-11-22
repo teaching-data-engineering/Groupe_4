@@ -16,7 +16,7 @@ def get_bq_data():
     
     # Exécutez la requête
     query = f"""select * 
-    from `dataset_groupe_4.enrich`
+    from `ai-technologies-ur2.dataset_groupe_4.enrich`
     """
     
     # Exécutez la requête

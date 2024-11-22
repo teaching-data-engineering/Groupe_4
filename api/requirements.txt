@@ -1,0 +1,5 @@
+google-cloud-bigquery
+google-auth
+fastapi
+uvicorn == 0.32.1
+db_dtypes
