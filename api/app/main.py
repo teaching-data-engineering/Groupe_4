@@ -1,14 +1,7 @@
 # Import des modules nécessaires pour l'application FastAPI et la gestion des données
-from typing import Optional
-from datetime import date
 from fastapi import FastAPI
-from fastapi import HTTPException
-from get_bq_data import get_bq_data  # Importation d'une fonction pour récupérer les données de BigQuery
-from pagination import display_data
-from difflib import SequenceMatcher  # Pour la recherche approximative de correspondance de noms
-import pandas as pd
+from get_bq_data import get_client  
 from endpoints import gets_endpoints, puts_endpoints
-from joblib import load  # Pour charger des modèles enregistrés (ex: Random Forest)
 from fastapi.responses import HTMLResponse
 
 # Initialisation de l'application FastAPI

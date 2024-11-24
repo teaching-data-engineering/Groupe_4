@@ -2,9 +2,8 @@
 from typing import Optional
 from datetime import date
 from fastapi import APIRouter
-from fastapi import HTTPException
 from pagination import display_data
-from get_bq_data import get_bq_data  # Importation d'une fonction pour récupérer les données de BigQuery
+from get_bq_data import get_client  # Importation d'une fonction pour récupérer les données de BigQuery
 from difflib import SequenceMatcher  # Pour la recherche approximative de correspondance de noms
 import pandas as pd
 from joblib import load  # Pour charger des modèles enregistrés (ex: Random Forest)
@@ -13,7 +12,7 @@ from joblib import load  # Pour charger des modèles enregistrés (ex: Random Fo
 router = APIRouter()
 
 # Connexion à BigQuery
-client = get_bq_data()
+client = get_client()
 
 # Spécification de la table dans BigQuery
 data = "`dataset_groupe_4.enrich`"
@@ -38,10 +37,13 @@ async def get_events(page: int = 1):
     
     return display
 
+# Description du champs
+
+
 
 # Route pour rechercher des événements selon des critères facultatifs : artistName, venueName, start_date, end_date
 @router.get("/events/search/")
-def event_search(
+async def event_search(
     artistName: Optional[str] = None, 
     venueName: Optional[str] = None, 
     start_date: Optional[str] = None, 
@@ -128,7 +130,7 @@ def event_artist(
 @router.get("/events/by-day-of-week")
 async def get_events_by_day_of_week(page: int = 1, week: str = None):
     query = f"""select * 
-    from {data}
+    from `dataset_groupe_4.enrich`
     """
     
     # Exécutez la requête

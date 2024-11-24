@@ -1,23 +1,19 @@
 # Import des modules nécessaires pour l'application FastAPI et la gestion des données
 from typing import Optional
-from datetime import date
 from fastapi import APIRouter
 from fastapi import HTTPException
-from pagination import display_data
-from get_bq_data import get_bq_data  # Importation d'une fonction pour récupérer les données de BigQuery
-from difflib import SequenceMatcher  # Pour la recherche approximative de correspondance de noms
-import pandas as pd
-from joblib import load  # Pour charger des modèles enregistrés (ex: Random Forest)
+from get_bq_data import get_client  # Importation d'une fonction pour récupérer les données de BigQuery
+
 # Initialisation de l'application FastAPI
 router = APIRouter()
 
 # Connexion à BigQuery
-client = get_bq_data()
+client = get_client()
 
 # Spécification de la table dans BigQuery
 data = "`dataset_groupe_4.enrich`"
 
-
+#
 @router.put("/events/update-events")
 async def update_events_informations(
     remplacement_type: str,  # Type à remplacer, doit être un des champs de la base

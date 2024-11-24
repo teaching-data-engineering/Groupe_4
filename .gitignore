@@ -1,12 +1,20 @@
-credentials/
-credentials/*
-*/__pycache__
+# environnement
+.env/
 pyproject.toml
 poetry.lock
+
+# dossiers #
+credentials/
+credentials/
+__pycache__/
 data/
 __pycache__/
 credentials/
 api/app/__pycache__/
-enrechissement.py
-api_key.txt
+event/
+
+# fichiers #
+enrichessement.py
 model_backup.py
+*.pyc
+api_key.txt
