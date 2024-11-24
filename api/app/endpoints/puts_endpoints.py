@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import APIRouter
 from fastapi import HTTPException
 from get_bq_data import get_client  # Importation d'une fonction pour récupérer les données de BigQuery
+from security import security
 
 # Initialisation de l'application FastAPI
 router = APIRouter()
@@ -16,12 +17,15 @@ data = "`dataset_groupe_4.enrich`"
 #
 @router.put("/events/update-events")
 async def update_events_informations(
+    admin_tonken: str,  # Token d'authentification
     remplacement_type: str,  # Type à remplacer, doit être un des champs de la base
     new_value: str,  # Nouvelle valeur pour le champ
     lieu: Optional[str] = None,  # Nom du lieu à filtrer
     artist: Optional[str] = None,  # Nom de l'artiste à filtrer
     date: Optional[str] = None  # Date à filtrer
 ):
+    # Vérification du token utilisateur
+    security.verify_token_user(admin_tonken)
     # Liste des champs autorisés pour la mise à jour
     valid_fields = ["startsAt", "artistName", "venueName"]
 

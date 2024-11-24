@@ -48,12 +48,16 @@ async def get_events(page: int = 1, token: str = None):
 # Route pour rechercher des événements selon des critères facultatifs : artistName, venueName, start_date, end_date
 @router.get("/events/search/")
 async def event_search(
+    token: str = None,
     artistName: Optional[str] = None, 
     venueName: Optional[str] = None, 
     start_date: Optional[str] = None, 
     end_date: Optional[str] = None,
     page: int = 1
 ):
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     # Liste pour stocker les conditions de la requête SQL
     conditions = []
 
@@ -93,9 +97,14 @@ async def event_search(
 # Route pour rechercher des événements en fonction du nom d'artiste
 @router.get("/events/artist/{artistName}")
 def event_artist(
-    artistName: str,
+    token: str = None,
+    artistName: str = None,
     page: int = 1
 ):
+    
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     # Fonction pour mesurer la similarité entre deux chaînes de caractères (pour les correspondances approximatives)
     def similar(a, b):
         return SequenceMatcher(None, a, b).ratio()
@@ -132,7 +141,10 @@ def event_artist(
 
 # Route pour obtenir des statistiques sur les événements par jour de la semaine (nombre d'événements par jour)
 @router.get("/events/by-day-of-week")
-async def get_events_by_day_of_week(page: int = 1, week: str = None):
+async def get_events_by_day_of_week(token: str = None ,page: int = 1, week: str = None):
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     query = f"""select * 
     from `dataset_groupe_4.enrich`
     """
@@ -157,7 +169,10 @@ async def get_events_by_day_of_week(page: int = 1, week: str = None):
 
 # Route pour obtenir des statistiques sur les événements par lieu (nombre d'événements par lieu)
 @router.get("/events/by-venue")
-def by_venue(page : int = 1):
+def by_venue(page : int = 1, token: str = None):
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     # Requête SQL pour obtenir le nombre d'événements par lieu et des statistiques globales
     statistics_query = f"""
         WITH event_counts AS (
@@ -196,7 +211,10 @@ def by_venue(page : int = 1):
 
 # Route pour comparer les événements en streaming et en personne
 @router.get("/events/streaming-vs-in-person")
-def streaming_vs_in_person():
+def streaming_vs_in_person(token: str = None):
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     # Requête SQL pour compter les événements par type (streaming ou en personne)
     query = f"""
         SELECT 
@@ -213,9 +231,13 @@ def streaming_vs_in_person():
 # Route pour prédire la popularité des événements basés sur l'artiste et le lieu
 @router.get("/events/is_popular")
 def is_popular(
+    token: str = None,
     artistName: Optional[str] = None,
     venueName: Optional[str] = None
 ): 
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     # Liste des conditions pour la requête SQL
     conditions = []
     if artistName:
@@ -262,10 +284,14 @@ def is_popular(
 
 @router.get("/events/popular_event_these_days")
 async def popular_event_these_days(
-    startdate: str,
+    token: str = None,
+    startdate: str = None,
     endate: Optional[str] = None,
     page: int = 1
 ):
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+    
     data = "`dataset_groupe_4.enrich`"
     if endate is None:
         endate = date.today().strftime("%Y-%m-%d")
