@@ -11,6 +11,7 @@ __pycache__/
 credentials/
 api/app/__pycache__/
 event/
+metatada/
 
 # fichiers #
 enrichessement.py
@@ -18,3 +19,5 @@ model_backup.py
 *.pyc
 api_key.txt
 data_viz.ipynb
+enrichessement.py
+upload_bigquery.py
