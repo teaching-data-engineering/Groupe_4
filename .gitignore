@@ -5,7 +5,6 @@ poetry.lock
 
 # dossiers #
 credentials/
-credentials/
 __pycache__/
 data/
 __pycache__/
@@ -18,3 +17,4 @@ enrichessement.py
 model_backup.py
 *.pyc
 api_key.txt
+data_viz.ipynb
