@@ -1,9 +1,6 @@
 import pandas_gbq
 from google.oauth2 import service_account 
 
-import pandas_gbq
-from google.oauth2 import service_account
-
 def data_to_gbq(df, replace=False):
     credentials = service_account.Credentials.from_service_account_file('credentials/sa-key-group-4.json')
     table_id = "dataset_groupe_4.enrich"
