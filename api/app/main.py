@@ -4,6 +4,7 @@ from get_bq_data import get_client
 from endpoints import gets_endpoints, puts_endpoints
 from fastapi.responses import HTMLResponse
 
+
 # Initialisation de l'application FastAPI
 app = FastAPI()
 

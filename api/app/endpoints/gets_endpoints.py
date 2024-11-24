@@ -7,8 +7,9 @@ from get_bq_data import get_client  # Importation d'une fonction pour récupére
 from difflib import SequenceMatcher  # Pour la recherche approximative de correspondance de noms
 import pandas as pd
 from joblib import load  # Pour charger des modèles enregistrés (ex: Random Forest)
+from security import security
 
-# Initialisation de l'application FastAPI
+# Initialisation de l'APIRouter
 router = APIRouter()
 
 # Connexion à BigQuery
@@ -19,7 +20,10 @@ data = "`dataset_groupe_4.enrich`"
 
 # Route pour obtenir tout les événements 
 @router.get("/events")
-async def get_events(page: int = 1):
+async def get_events(page: int = 1, token: str = None):
+    # Vérification du token utilisateur
+    security.verify_token_user(token)
+
     query = f"""select * 
     from  {data}
     """
